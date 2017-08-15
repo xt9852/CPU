@@ -65,7 +65,7 @@
 - 微指令跳转部分=>微指令驱动部分=>微指令存储部分=>寄存器与总线部分,ALU与临时寄存器部分,内存部分
 
 ### 微代码说明
-[微代码详细](https://github.com/xt9852/CPU/blob/master/mi/mi.xls)
+[微代码详细](https://github.com/xt9852/CPU/blob/master/doc/mi.xls)
 
 |列名称|说明|
 |----|----|
