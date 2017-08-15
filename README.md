@@ -95,7 +95,7 @@
 |L|H|H|H|H|*|A或B|
 |L|H|H|L|H|*|A异或B|
 |H|L|L|H|L|H|A加B|
-|H|H|H|L|L|H|A减B|
+|L|H|H|L|L|L|A减B|
 |L|L|L|L|L|L|A++|
 |H|H|H|H|L|H|A--|
 
