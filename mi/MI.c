@@ -1,11 +1,13 @@
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
+#define MAX_FILE        64
 #define FILENAME_INPUT  "./mi_src.txt"
 #define FILENAME_OUTPUT "./mi_%d.bin"
 
-int get_hex(char i)
+unsigned char get_hex(char i)
 {
     if (i >= '0' && i <= '9')
     {
@@ -21,8 +23,26 @@ int get_hex(char i)
     }
     else
     {
-        return -1;
+        printf("%s %c error\n", __FUNCTION__, i);
+        return 0;
     }
+}
+
+void parse(unsigned char *data, int pos, char num)
+{
+    if ('0' == num)
+    {
+        return;
+    }
+
+    int bit_id = pos % 8;
+    int data_id = pos / 8;
+
+    unsigned char item = 0x01;
+
+    item <<= bit_id;
+
+    data[data_id] |= item;
 }
 
 int main()
@@ -36,103 +56,114 @@ int main()
     }
 
     int i;
-    int pos;
-    int len;
-    int head;
-    int count;
-    int out_id;
+    int j;
+    int num;
+    int mi_len;
+    int id_len;
+    int next_len;
+    int line_len;
+    int head_len;
+    int data_len;
+    int file_count;
     int id_num;
     int id_num_last;
-    int next_num;
-    char *ptr;
     char id[16];
     char next[16];
-    char buf[1024];
-    char filename[64];
+    char buff[1024];
+    char filename[512];
     unsigned char mi;
-    int n[64] = { 0 };
-    FILE *out[64] = { NULL };
+    unsigned char *data = NULL;
+    FILE *file[MAX_FILE] = { NULL };
+
+    mi = 0;
     id_num_last = 0;
 
-    while (NULL != fgets(buf, sizeof(buf) - 1, fp))
+    while (NULL != fgets(buff, sizeof(buff) - 1, fp))
     {
-        sscanf(buf, "%s\t%s", id, next);
-        len = strlen(buf) - 1; // \n
-        pos = strlen(id);
-        head = pos + strlen(next) + 2;
-        count = (len - head) / 16 + (((len - head) % 16) != 0);
+        sscanf(buff, "%s\t%s\t", id, next);
+
         id_num = 0;
-        next_num = 0;
+        id_len = strlen(id);
+        next_len = strlen(next);
+        line_len = strlen(buff);
+        head_len = id_len + next_len + 2; // 2个tab
+        data_len = line_len - head_len;
+        mi_len = (next_len - 2) * 4 + data_len / 2;
+        file_count = ceil(mi_len / 8.0);
 
-        for (i = 2; i < pos; i++)
+        if (file_count > MAX_FILE)
         {
-            id_num = (id_num << 4) | get_hex(id[i]);
+            printf("file_count > %d\n", MAX_FILE);
+            return 0;
         }
 
-        for (i = 2; i < pos; i++)
+        if (NULL == data)
         {
-            next_num = (next_num << 4) | get_hex(next[i]);
+            data = (unsigned char*)malloc(file_count);
         }
 
-        for (i = 0; i <= count; i++)
+        memset(data, 0, file_count);
+
+        for (i = 0; i < file_count; i++)
         {
             sprintf(filename, FILENAME_OUTPUT, i);
 
-            if (NULL == out[i])
+            if (NULL == file[i])
             {
-                out[i] = fopen(filename, "wb");
+                file[i] = fopen(filename, "wb");
             }
 
-            if (NULL == out[i])
+            if (NULL == file[i])
             {
                 printf("create file %s fail\n", filename);
                 return 0;
             }
         }
 
-        mi = 0;
-        ptr = buf + head;
+        for (i = 2; i < id_len; i++)
+        {
+            id_num = (id_num << 4) | get_hex(id[i]);
+        }
 
+        for (i = 2; i < next_len; i++)
+        {
+            num = get_hex(next[next_len - i + 1]);
+
+            for (j = 0; j < 4; j++)
+            {
+                parse(data, (i - 2) * 4 + j, '0' + ((num >> j) & 0x01));
+            }
+        }
+
+        // 填充空白
         for (i = id_num_last + 1; i < id_num; i++)
         {
-            for (out_id = 0; out_id <= count; out_id++)
+            for (j = 0; j < file_count; j++)
             {
-                n[out_id]++;
-                fwrite(&mi, 1, 1, out[out_id]);
+                fwrite(&mi, 1, 1, file[j]);
             }
         }
 
-        printf("%s %s %x %x\n", id, next, id_num, next_num);
+        printf("%s %s\n", id, next);
 
-        for (out_id = 0, pos = 0; *ptr == '0' || *ptr == '1'; ptr += 2)
+        // 解析数据
+        for (i = 0; i < data_len; i++)
         {
-            mi |= ((*ptr - '0') << pos);
-
-            if (++pos == 8)
-            {
-                printf("out_id:%d %d\n", out_id, n[out_id]++);
-                fwrite(&mi, 1, 1, out[out_id]);
-                mi = 0;
-                pos = 0;
-                out_id++;
-                
-            }
+            parse(data, (next_len - 2) * 4 + i, buff[head_len + i * 2]);
         }
 
-        if (pos != 0)
+        // 写入文件
+        for (i = 0; i < file_count; i++)
         {
-            printf("out_id:%d %d\n", out_id, n[out_id]++);
-            fwrite(&mi, 1, 1, out[out_id]);
+            fwrite(&data[i], 1, 1, file[i]);
         }
-
-        fwrite(&next_num, 1, 1, out[count]);
 
         id_num_last = id_num;
     }
 
-    for (i = 0; i <= count; i++)
+    for (i = 0; i < file_count; i++)
     {
-        fclose(out[i]);
+        fclose(file[i]);
     }
 
     fclose(fp);
