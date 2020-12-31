@@ -4,7 +4,7 @@
 #include <math.h>
 
 #define MAX_FILE        64
-#define FILENAME_INPUT  "./mi_src.txt"
+#define FILENAME_INPUT  "./mi.txt"
 #define FILENAME_OUTPUT "./mi_%d.bin"
 
 // 将16进制字符串转成数字
