@@ -65,27 +65,27 @@ void get_mi()
     UART_send_string("--save--data--\r");
     
     i = get_data(12);
-    sprintf(buff, "MINA:    0x%03X\r", i);
+    sprintf(buff, "AC:      0x%03X\r", i);
 
     UART_send_string(buff);
     i = get_data(12);
-    sprintf(buff, "MIA:     0x%03X\r", i);
+    sprintf(buff, "AT:      0x%03X\r", i);
     UART_send_string(buff);
 
     i = get_data(12);
-    sprintf(buff, "MIN:     0x%03X\r", i);
+    sprintf(buff, "AN:      0x%03X\r", i);
     UART_send_string(buff);
 
     i = get_data(8);
-    sprintf(buff, "A:       0x%02X\r", i);
+    sprintf(buff, "BA:      0x%02X\r", i);
     UART_send_string(buff);
 
     i = get_data(8);
-    sprintf(buff, "D:       0x%02X\r", i);
+    sprintf(buff, "BD:      0x%02X\r", i);
     UART_send_string(buff);
 
     i = get_data(8);
-    sprintf(buff, "F:       0x%02X\r", i);
+    sprintf(buff, "BF:      0x%02X\r", i);
     UART_send_string(buff);
 
     i = get_data(1);
@@ -97,11 +97,11 @@ void get_mi()
     UART_send_string(buff);
 
     i = get_data(2);
-    sprintf(buff, "SEL-AB:  %d\r", i);
+    sprintf(buff, "SIG-AB:  %d\r", i);
     UART_send_string(buff);
 
     i = get_data(1);
-    sprintf(buff, "CHK-IR:  %d\r", i);
+    sprintf(buff, "CHK-BI:  %d\r", i);
     UART_send_string(buff);
 
     i = get_data(1);
@@ -134,62 +134,63 @@ void get_mi()
 
     j = get_data(1);
     k = get_data(1);
-    sprintf(buff, "IR:%s %s\r", (j==0?"R":"W"), (k==0?"DBus":""));
+    sprintf(buff, "RI:%s %s\r", (j==0?"R":"W"), (k==0?"DBus":""));
     UART_send_string(buff);
 
     i = get_data(1);
     j = get_data(1);
     k = get_data(1);
-    sprintf(buff, "IF:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
+    sprintf(buff, "RF:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
     UART_send_string(buff);
 
     i = get_data(1);
     j = get_data(1);
     k = get_data(1);
-    sprintf(buff, "IP:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
+    sprintf(buff, "RP:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
     UART_send_string(buff);
 
     i = get_data(1);
     j = get_data(1);
     k = get_data(1);
-    sprintf(buff, "SP:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
+    sprintf(buff, "RS:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
     UART_send_string(buff);
 
     i = get_data(1);
     j = get_data(1);
     k = get_data(1);
-    sprintf(buff, "AR:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
-    UART_send_string(buff);
-
-
-    i = get_data(1);
-    j = get_data(1);
-    k = get_data(1);
-    sprintf(buff, "BR:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
-    UART_send_string(buff);
-
-    i = get_data(1);
-    j = get_data(1);
-    k = get_data(1);
-    sprintf(buff, "CR:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
+    sprintf(buff, "RA:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
     UART_send_string(buff);
 
 
     i = get_data(1);
     j = get_data(1);
     k = get_data(1);
-    sprintf(buff, "DR:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
+    sprintf(buff, "RB:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
+    UART_send_string(buff);
+
+    i = get_data(1);
+    j = get_data(1);
+    k = get_data(1);
+    sprintf(buff, "RC:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
+    UART_send_string(buff);
+
+
+    i = get_data(1);
+    j = get_data(1);
+    k = get_data(1);
+    sprintf(buff, "RD:%s %s %s\r", (j==0?"R":"W"), (k==0?"DBus":""), (i==0?"ABus":""));
     UART_send_string(buff);
 
     i = get_data(6);
     if (i == 0) sprintf(buff, "ALU:++\r");
+    else if (i == 0x13) sprintf(buff, "ALU:0xFF\r", i);
     else if (i == 0x34) sprintf(buff, "ALU:0xFF\r", i);
     else sprintf(buff, "ALU:%x\r", i);
     UART_send_string(buff);
 
     j = get_data(1);
     k = get_data(1);
-    sprintf(buff, "TR:%s %s\r", (j==0?"R":"W"), (k==0?"DBus":""));
+    sprintf(buff, "RT:%s %s\r", (j==0?"R":"W"), (k==0?"DBus":""));
     UART_send_string(buff);
 
     i = get_data(1); // M-CE
